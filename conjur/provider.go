@@ -38,6 +38,26 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "Conjur API key",
 			},
+			"aws_iam_role": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "AWS IAM role",
+
+			"aws_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "AWS account",
+			},
+			"authn_iam_service_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Conjur service ID for authenticating to AWS",
+			},
+			"aws_region": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "AWS region",
+			},
 			"ssl_cert": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -47,11 +67,11 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Path to Conjur public SSL certificate",
-			},
 		},
 		ConfigureFunc: providerConfig,
+			ConfigureFunc: providerConfig,
+		}
 	}
-}
 
 func providerConfig(d *schema.ResourceData) (interface{}, error) {
 
@@ -93,6 +113,25 @@ func providerConfig(d *schema.ResourceData) (interface{}, error) {
 		loginPair := authn.LoginPair{Login: login, APIKey: apiKey}
 
 		return conjurapi.NewClientFromKey(config, loginPair)
+	}
+
+	// If AWS parameters have been specified in the schema, use them. Otherwise,	
+	// assume the environment has everything needed.
+	login := d.Get("login").(string)
+	aws_iam_role := d.Get("aws_iam_role").(string)
+	authn_iam_service_id := d.Get("authn_iam_service_id").(string)
+	aws_region := d.Get("aws_region").(string)
+	aws_account := d.Get("aws_account").(string)
+	if login != "" && aws_iam_role != "" && aws_account != "" && authn_iam_service_id != "" && aws_region != "" {
+		iamAuthn := authn.IAMAuthn{
+			Login: login,
+			AwsIamRole: aws_iam_role,
+			AwsAccount: aws_account,
+			AuthnIamServiceId: authn_iam_service_id,
+			AwsRegion: aws_region,
+		}
+		
+		return conjurapi.NewClientFromIAMAuthn(config, iamAuthn)
 	}
 
 	return conjurapi.NewClientFromEnvironment(config)
