@@ -121,9 +121,15 @@ provider configuration in the `.tf` file.
 ```sh
 export CONJUR_APPLIANCE_URL="https://conjur-server"
 export CONJUR_ACCOUNT="myorg"
-export CONJUR_AUTHN_LOGIN="admin"
-export CONJUR_AUTHN_API_KEY="3ahcddy39rcxzh3ggac4cwk3j2r8pqwdg33059y835ys2rh2kzs2a"
 export CONJUR_CERT_FILE="/etc/conjur.pem"
+export CONJUR_AUTHN_LOGIN="host/example"
+# If using the API Key Authentication:
+export CONJUR_AUTHN_API_KEY="3ahcddy39rcxzh3ggac4cwk3j2r8pqwdg33059y835ys2rh2kzs2a"
+# Or if using AWS IAM Authentication:
+export CONJUR_AWS_IAM_ROLE="iam-role"
+export CONJUR_AWS_REGION="region"
+export CONJUR_AUTHN_IAM_SERVICE-ID="IAM-Authenticator-ID"
+
 ```
 
 No other configuration is necessary in `main.tf`:
@@ -171,7 +177,14 @@ provider "conjur" {
   account = "myorg"
 
   login = "admin"
+
+  # If using the API Key Authentication:
   api_key = var.conjur_api_key
+
+  # Or if using AWS IAM Authentication:
+  conjur_aws_iam_role = "iam-role"
+  conjur_aws_region = "region"
+  conjur_authn-iam-service-id = "IAM-Authenticator-ID" 
 }
 ```
 
