@@ -182,9 +182,9 @@ provider "conjur" {
   api_key = var.conjur_api_key
 
   # Or if using AWS IAM Authentication:
-  conjur_aws_iam_role = "iam-role"
-  conjur_aws_region = "region"
-  conjur_authn-iam-service-id = "IAM-Authenticator-ID" 
+  aws_iam_role = "iam-role"
+  aws_region = "region"
+  authn-iam-service-id = "IAM-Authenticator-ID" 
 }
 ```
 
